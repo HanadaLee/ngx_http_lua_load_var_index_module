@@ -27,7 +27,7 @@ static char *ngx_http_lua_load_var_index(ngx_conf_t *cf, ngx_command_t *cmd,
 static ngx_command_t  ngx_http_lua_load_var_index_commands[] = {
 
     { ngx_string("lua_load_var_index"),
-      NGX_HTTP_MAIN_CONF|NGX_CONF_TAKE1,
+      NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_CONF_TAKE1,
       ngx_http_lua_load_var_index,
       0,
       0,
