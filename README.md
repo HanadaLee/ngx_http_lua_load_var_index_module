@@ -20,6 +20,7 @@ Description
 ===========
 Separate from [lua-kong-nginx-module](https://github.com/Kong/lua-kong-nginx-module). it can enable indexed variable access for `ngx.var`. Indexed variable access is a faster way of accessing Nginx variables for OpenResty.
 
+refer to [How We Got a 12% Increase in RPS and a 37% Drop in Latency](https://konghq.com/blog/engineering/kong-gateway-performance).
 
 Install
 =======
