@@ -39,7 +39,7 @@ lua\_load\_var\_index
 -------------------------------------------
 **syntax:** *lua_load_var_index $variable | default;*
 
-**context:** *http*
+**context:** *http, server, location*
 
 Ensure *variable* is indexed. Note that variables defined by `set` directive
 are always indexed by default and does not need to be defined here again.
@@ -55,6 +55,8 @@ Common variables defined by other modules that are already indexed:
 - `$http_referer`
 - `$http_user_agent`
 - `$host`
+
+Tips: Allowing directives to be used at the server and location level is only for configuration management convenience. All configurations will take effect at the http level.
 
 See [resty.var.patch\_metatable](#restyvarpatch_metatable) on how to enable
 indexed variable access.
