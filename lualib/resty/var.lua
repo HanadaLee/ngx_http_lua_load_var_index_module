@@ -53,7 +53,7 @@ if subsystem == "http" then
     --ngx_lua_ffi_var_get_by_index = C.ngx_http_lua_ffi_var_get_by_index
     --ngx_lua_ffi_var_set_by_index = C.ngx_http_lua_ffi_var_set_by_index
     --ngx_lua_ffi_var_load_indexes = C.ngx_http_lua_ffi_var_load_indexes
-    
+
     str_replace_char = require("resty.core.utils").str_replace_char
     replace_dashes_lower = function(str)
         return str_replace_char(str:lower(), "-", "_")
@@ -161,22 +161,22 @@ end
 
 
 local function patch_functions()
-  local orig_set_uri_args = req.set_uri_args
+    local orig_set_uri_args = req.set_uri_args
 
-  req.set_uri_args = function(...)
-    variable_index.args = nil
-    return orig_set_uri_args(...)
-  end
-  
-  local orig_set_header = req.set_header
+    req.set_uri_args = function(...)
+        variable_index.args = nil
+        return orig_set_uri_args(...)
+    end
 
-  req.set_header = function(name, value)
-    local normalized_header = replace_dashes_lower(name)
-    normalized_header = HTTP_PREFIX .. normalized_header
-    variable_index[normalized_header] = nil
+    local orig_set_header = req.set_header
 
-    return orig_set_header(name, value)
-  end
+    req.set_header = function(name, value)
+        local normalized_header = replace_dashes_lower(name)
+        normalized_header = HTTP_PREFIX .. normalized_header
+        variable_index[normalized_header] = nil
+
+        return orig_set_header(name, value)
+    end
 end
 
 

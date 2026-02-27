@@ -6,14 +6,15 @@ ngx_http_lua_load_var_index_module
 Table of Contents
 =================
 
-* [Name](#name)
-* [Description](#description)
-* [Install](#install)
-* [Directives](#directives)
-    * [lua\_load\_var\_index](#lua_load_var_index)
-* [Methods](#methods)
-    * [resty.var.patch\_metatable](#restyvarpatch_metatable)
-* [License](#license)
+- [Name](#name)
+- [Table of Contents](#table-of-contents)
+- [Description](#description)
+- [Install](#install)
+- [Directives](#directives)
+  - [lua\_load\_var\_index](#lua_load_var_index)
+- [Methods](#methods)
+  - [resty.var.patch\_metatable](#restyvarpatch_metatable)
+- [License](#license)
 
 
 Description
@@ -94,7 +95,7 @@ License
 
 ```
 Copyright (C) Hanada
-Copyright 2020-2023 Kong Inc.
+Copyright 2020-2026 Kong Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

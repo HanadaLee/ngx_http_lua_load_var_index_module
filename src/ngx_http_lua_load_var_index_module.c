@@ -142,7 +142,7 @@ ngx_http_lua_ffi_var_get_by_index(ngx_http_request_t *r, ngx_uint_t index,
         return NGX_ERROR;
     }
 
-    vv = ngx_http_get_indexed_variable(r, index);
+    vv = ngx_http_get_flushed_variable(r, index);
     if (vv == NULL || vv->not_found) {
         ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                 "variable value is not found by index %d", index);
