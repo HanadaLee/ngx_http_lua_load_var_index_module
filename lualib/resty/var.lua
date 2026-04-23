@@ -29,11 +29,9 @@ local replace_dashes_lower
 
 local HTTP_PREFIX = "http_"
 
---Add back if stream module is implemented to aid readability
---see bottom of: https://luajit.org/ext_ffi_tutorial.html
---local ngx_lua_ffi_var_get_by_index
---local ngx_lua_ffi_var_set_by_index
---local ngx_lua_ffi_var_load_indexes
+local ngx_lua_ffi_var_get_by_index
+local ngx_lua_ffi_var_set_by_index
+local ngx_lua_ffi_var_load_indexes
 
 
 if subsystem == "http" then
@@ -48,16 +46,30 @@ if subsystem == "http" then
     unsigned int ngx_http_lua_ffi_var_load_indexes(ngx_str_t **names);
     ]]
 
-    --Add back if stream module is implemented to aid readability
-    --see bottom of: https://luajit.org/ext_ffi_tutorial.html
-    --ngx_lua_ffi_var_get_by_index = C.ngx_http_lua_ffi_var_get_by_index
-    --ngx_lua_ffi_var_set_by_index = C.ngx_http_lua_ffi_var_set_by_index
-    --ngx_lua_ffi_var_load_indexes = C.ngx_http_lua_ffi_var_load_indexes
+    ngx_lua_ffi_var_get_by_index = C.ngx_http_lua_ffi_var_get_by_index
+    ngx_lua_ffi_var_set_by_index = C.ngx_http_lua_ffi_var_set_by_index
+    ngx_lua_ffi_var_load_indexes = C.ngx_http_lua_ffi_var_load_indexes
 
     str_replace_char = require("resty.core.utils").str_replace_char
     replace_dashes_lower = function(str)
         return str_replace_char(str:lower(), "-", "_")
     end
+
+elseif subsystem == "stream" then
+    ffi.cdef[[
+    int ngx_stream_lua_ffi_var_get_by_index(ngx_stream_lua_request_t *r,
+        unsigned int var_index, char **value, size_t *value_len, char **err);
+
+    int ngx_stream_lua_ffi_var_set_by_index(ngx_stream_lua_request_t *r,
+        unsigned int index, const unsigned char *value, size_t value_len,
+        char **err);
+
+    unsigned int ngx_stream_lua_ffi_var_load_indexes(ngx_str_t **names);
+    ]]
+
+    ngx_lua_ffi_var_get_by_index = C.ngx_stream_lua_ffi_var_get_by_index
+    ngx_lua_ffi_var_set_by_index = C.ngx_stream_lua_ffi_var_set_by_index
+    ngx_lua_ffi_var_load_indexes = C.ngx_stream_lua_ffi_var_load_indexes
 end
 
 
@@ -75,23 +87,18 @@ local function get_request()
     return r
 end
 
+
 local function load_indexes()
     if get_phase() ~= "init" then
         error("load_indexes can only be called in init phase")
     end
 
-    --Add back if stream module is implemented to aid readability
-    --see bottom of: https://luajit.org/ext_ffi_tutorial.html
-    --local count = ngx_lua_ffi_var_load_indexes(nil)
-    local count = C.ngx_http_lua_ffi_var_load_indexes(nil)
+    local count = ngx_lua_ffi_var_load_indexes(nil)
     count = tonumber(count)
 
     local names_buf = ffi_new("ngx_str_t *[?]", count)
 
-    --Add back if stream module is implemented to aid readability
-    --see bottom of: https://luajit.org/ext_ffi_tutorial.html
-    --local rc = ngx_lua_ffi_var_load_indexes(names_buf)
-    local rc = C.ngx_http_lua_ffi_var_load_indexes(names_buf)
+    local rc = ngx_lua_ffi_var_load_indexes(names_buf)
 
     if rc == NGX_OK then
         for i = 0, count - 1 do
@@ -109,10 +116,7 @@ local function var_get_by_index(index)
 
     local value_len = get_size_ptr()
 
-    --Add back if stream module is implemented to aid readability
-    --see bottom of: https://luajit.org/ext_ffi_tutorial.html
-    --local rc = ngx_lua_ffi_var_get_by_index(r, index, value_ptr, value_len, errmsg)
-    local rc = C.ngx_http_lua_ffi_var_get_by_index(r, index, value_ptr,
+    local rc = ngx_lua_ffi_var_get_by_index(r, index, value_ptr,
                                                         value_len, errmsg)
 
     if rc == NGX_OK then
@@ -144,11 +148,7 @@ local function var_set_by_index(index, value)
         value_len = #value
     end
 
-    --Add back if stream module is implemented to aid readability
-    --see bottom of: https://luajit.org/ext_ffi_tutorial.html
-    --local rc = ngx_lua_ffi_var_set_by_index(r, index, value,
-    --                                             value_len, errmsg)
-    local rc = C.ngx_http_lua_ffi_var_set_by_index(r, index, value,
+    local rc = ngx_lua_ffi_var_set_by_index(r, index, value,
                                                         value_len, errmsg)
 
     if rc == NGX_OK then
@@ -215,7 +215,9 @@ local function patch_metatable()
         return orig_set(self, name, value)
     end
 
-    patch_functions()
+    if subsystem == "http" then
+        patch_functions()
+    end
 end
 
 
@@ -228,14 +230,6 @@ end
 local function get_by_name(name)
     local index = assert(variable_index[name], "nginx variable is not indexed")
     return var_get_by_index(index)
-end
-
-
-if subsystem == "stream" then
-    patch_metatable = function() end
-    load_indexes = function() end
-    set_by_name = function() end
-    get_by_name = function() end
 end
 
 

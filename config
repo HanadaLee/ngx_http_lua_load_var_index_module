@@ -1,17 +1,43 @@
-ngx_module_type=HTTP
-ngx_module_name=ngx_http_lua_load_var_index_module
-ngx_module_srcs=" \
-                $ngx_addon_dir/src/ngx_http_lua_load_var_index_module.c \
-                "
+if [ $HTTP != NO ]; then
 
-if [ -z "$NGX_LUA_LOC" ]; then
-    ngx_lua_loc="../ngx_lua-*"
-else
-    ngx_lua_loc="$NGX_LUA_LOC"
+    ngx_module_type=HTTP
+    ngx_module_name=ngx_http_lua_load_var_index_module
+    ngx_module_srcs=" \
+                    $ngx_addon_dir/src/ngx_http_lua_load_var_index_module.c \
+                    "
+
+    if [ -z "$NGX_LUA_LOC" ]; then
+        ngx_lua_loc="../ngx_lua-*"
+    else
+        ngx_lua_loc="$NGX_LUA_LOC"
+    fi
+
+    ngx_module_incs="$ngx_addon_dir/src $ngx_lua_loc/src"
+
+    . auto/module
+
+    ngx_addon_name=$ngx_module_name
+
 fi
 
-ngx_module_incs="$ngx_addon_dir/src $ngx_lua_loc/src"
+if [ $STREAM != NO -a $nginx_version -gt 1011001 ]; then
 
-. auto/module
+    ngx_module_type=STREAM
+    ngx_module_name=ngx_stream_lua_load_var_index_module
+    ngx_module_srcs=" \
+                    $ngx_addon_dir/src/ngx_stream_lua_load_var_index_module.c \
+                    "
 
-ngx_addon_name=$ngx_module_name
+    if [ -z "$NGX_STREAM_LUA_LOC" ]; then
+        ngx_stream_lua_loc="../ngx_stream_lua-*"
+    else
+        ngx_stream_lua_loc="$NGX_STREAM_LUA_LOC"
+    fi
+
+    ngx_module_incs="$ngx_addon_dir/src $ngx_stream_lua_loc/src"
+
+    . auto/module
+
+    ngx_addon_name=$ngx_module_name
+
+fi
