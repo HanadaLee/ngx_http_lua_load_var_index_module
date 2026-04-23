@@ -12,6 +12,7 @@ Table of Contents
 - [Install](#install)
 - [Directives](#directives)
   - [lua\_load\_var\_index](#lua_load_var_index)
+  - [lua\_load\_var\_index](#lua_load_var_index-1)
 - [Methods](#methods)
   - [resty.var.patch\_metatable](#restyvarpatch_metatable)
 - [License](#license)
@@ -29,7 +30,7 @@ This module can be installed just like any ordinary Nginx C module, using the
 `--add-module` configuration option:
 
 ```shell
-./configure --add-module=/path/to/ngx_http_lua_load_var_index_module \
+./configure --add-module=/path/to/ngx_lua_load_var_index_module \
             ...
 
 ```
@@ -39,12 +40,11 @@ Directives
 
 lua\_load\_var\_index
 -------------------------------------------
-**syntax:** *lua_load_var_index $variable | default;*
+**syntax:** *lua_load_var_index $variable;*
 
 **context:** *http, server, location*
 
-Ensure *variable* is indexed. Note that variables defined by `set` directive
-are always indexed by default and does not need to be defined here again.
+Ensure *variable* is indexed. Note that variables defined by `set` directive are always indexed by default and does not need to be defined here again.
 
 Common variables defined by other modules that are already indexed:
 
@@ -57,6 +57,14 @@ Common variables defined by other modules that are already indexed:
 - `$http_referer`
 - `$http_user_agent`
 - `$host`
+
+lua\_load\_var\_index
+-------------------------------------------
+**syntax:** *lua_load_var_index $variable;*
+
+**context:** *stream, server*
+
+Ensure *variable* is indexed. Note that variables defined by `set` directive are always indexed by default and does not need to be defined here again.
 
 Tips: Allowing directives to be used at the server and location level is only for configuration management convenience. All configurations will take effect at the http level.
 
@@ -74,7 +82,7 @@ resty.var.patch\_metatable
 
 **context:** *init_by_lua*
 
-**subsystems:** *http*
+**subsystems:** *http*, *stream*
 
 Indexed variable access is a faster way of accessing Nginx variables for OpenResty.
 This method patches the metatable of `ngx.var` to enable index access to variables
