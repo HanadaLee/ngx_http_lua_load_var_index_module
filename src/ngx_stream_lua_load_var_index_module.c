@@ -75,7 +75,7 @@ ngx_stream_lua_load_var_index(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 
     if (value[1].data[0] != '$') {
         ngx_conf_log_error(NGX_LOG_EMERG, cf, 0,
-                            "invalid variable name \"%V\"", &value[1]);
+                           "invalid variable name \"%V\"", &value[1]);
         return NGX_CONF_ERROR;
     }
 
@@ -146,7 +146,7 @@ ngx_stream_lua_ffi_var_get_by_index(ngx_stream_lua_request_t *r,
     vv = ngx_stream_get_flushed_variable(s, index);
     if (vv == NULL || vv->not_found) {
         ngx_log_debug1(NGX_LOG_DEBUG_STREAM, s->connection->log, 0,
-                "variable value is not found by index %d", index);
+                       "variable value is not found by index %d", index);
 
         return NGX_DECLINED;
     }
